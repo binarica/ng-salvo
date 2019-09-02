@@ -40,15 +40,10 @@ public class Player {
 		return userName;
 	}
 
-	public void addGamePlayer(GamePlayer gamePlayer) {
-		gamePlayer.setPlayer(this);
-		gamePlayers.add(gamePlayer);
-	}
-
 	@JsonIgnore
 	public List<Game> getGames() {
 		return gamePlayers.stream()
-				.map(gp -> gp.getGame())
+				.map(GamePlayer::getGame)
 				.collect(toList());
 	}
 }

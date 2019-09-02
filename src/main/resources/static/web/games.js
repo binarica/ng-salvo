@@ -1,15 +1,13 @@
-$(document).ready(() => {
-	$.ajax({
-		url: "/api/games"
-	}).done((data) => {
-		renderList(data);
-	});
+document.addEventListener("DOMContentLoaded", () => {
+	fetch("/api/games")
+		.then((response) => response.json())
+		.then((data) => renderList(data));
 
 	function getItemHtml(game) {
 		let date = new Date(game.created);
-		let emails = game.gamePlayers.map((gamePlayer) => gamePlayer.player.email).join(", ");
+		let players = game.gamePlayers.map((gamePlayer) => gamePlayer.player.email).join(", ");
 
-		return "<li>" + date.toLocaleString() + ": " + emails + "</li>";
+		return "<li>" + date.toLocaleString() + ": " + players + "</li>";
 	}
 
 	function getListHtml(data) {
@@ -17,8 +15,6 @@ $(document).ready(() => {
 	}
 
 	function renderList(data) {
-		let html = getListHtml(data);
-		document.getElementById("games").innerHTML = html;
+		document.querySelector("#games").innerHTML = getListHtml(data);
 	}
 });
-

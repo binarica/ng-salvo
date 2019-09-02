@@ -41,15 +41,14 @@ public class Game {
 		return date;
 	}
 
-	public void addGamePlayer(GamePlayer gamePlayer) {
-		gamePlayer.setGame(this);
-		gamePlayers.add(gamePlayer);
-	}
-
 	@JsonIgnore
 	public List<Player> getPlayers() {
 		return gamePlayers.stream()
-				.map(gp -> gp.getPlayer())
+				.map(GamePlayer::getPlayer)
 				.collect(toList());
+	}
+
+	public Set<GamePlayer> getGamePlayers() {
+		return gamePlayers;
 	}
 }

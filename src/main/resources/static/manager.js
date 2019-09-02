@@ -1,55 +1,53 @@
+$(() => {
 
+	// display text in the output area
+	function showOutput(text) {
+		$("#output").text(text);
+	}
 
-$(function() {
+	// load and display JSON sent by server for /players
 
-    // display text in the output area
-    function showOutput(text) {
-        $("#output").text(text);
-    }
+	function loadData() {
+		$.get("/rest/players")
+			.done(function(data) {
+				showOutput(JSON.stringify(data, null, 2));
+			})
+			.fail(function( jqXHR, textStatus ) {
+				showOutput( "Failed: " + textStatus );
+			});
+	}
 
-    // load and display JSON sent by server for /players
+	// handler for when user clicks add person
 
-    function loadData() {
-        $.get("/players")
-            .done(function(data) {
-                showOutput(JSON.stringify(data, null, 2));
-            })
-            .fail(function( jqXHR, textStatus ) {
-                showOutput( "Failed: " + textStatus );
-            });
-    }
+	function addPlayer() {
+		var name = $("#email").val();
+		if (name) {
+			postPlayer(name);
+		}
+	}
 
-    // handler for when user clicks add person
+	// code to post a new player using AJAX
+	// on success, reload and display the updated data from the server
 
-    function addPlayer() {
-        var name = $("#email").val();
-        if (name) {
-            postPlayer(name);
-        }
-    }
+	function postPlayer(userName) {
+		$.post({
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			dataType: "text",
+			url: "/rest/players",
+			data: JSON.stringify({ "userName": userName })
+		})
+			.done(function( ) {
+				showOutput( "Saved -- reloading");
+				loadData();
+			})
+			.fail(function( jqXHR, textStatus ) {
+				showOutput( "Failed: " + textStatus );
+			});
+	}
 
-    // code to post a new player using AJAX
-    // on success, reload and display the updated data from the server
+	$("#add_player").on("click", addPlayer);
 
-    function postPlayer(userName) {
-        $.post({
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            dataType: "text",
-            url: "/players",
-            data: JSON.stringify({ "userName": userName })
-        })
-            .done(function( ) {
-                showOutput( "Saved -- reloading");
-                loadData();
-            })
-            .fail(function( jqXHR, textStatus ) {
-                showOutput( "Failed: " + textStatus );
-            });
-    }
-
-    $("#add_player").on("click", addPlayer);
-
-    loadData();
+	loadData();
 });
