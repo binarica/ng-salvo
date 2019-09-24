@@ -20,13 +20,14 @@ public class SalvoApplication {
 	public CommandLineRunner initData(PlayerRepository playerRepository,
 	                                  GameRepository gameRepository,
 	                                  GamePlayerRepository gamePlayerRepository,
-	                                  ShipRepository shipRepository) {
+	                                  ShipRepository shipRepository,
+	                                  SalvoRepository salvoRepository) {
 		return (args) -> {
 
 			Stream.of("j.bauer@ctu.gov", "c.obrian@ctu.gov", "t.almeida@ctu.gov", "d.palmer@whitehouse.gov").forEach(userName -> {
-				Player player = new Player(userName);
-				playerRepository.save(player);
-			});
+						Player player = new Player(userName);
+						playerRepository.save(player);
+					});
 
 			Date date = new Date();
 
@@ -53,6 +54,21 @@ public class SalvoApplication {
 			shipRepository.save(ship1);
 			shipRepository.save(ship2);
 			shipRepository.save(ship3);
+
+			Salvo salvo1 = new Salvo(1L, Arrays.asList("H1", "A2"));
+			Salvo salvo2 = new Salvo(1L, Arrays.asList("C5", "E6"));
+			Salvo salvo3 = new Salvo(2L, Arrays.asList("B4", "D8"));
+			Salvo salvo4 = new Salvo(2L, Arrays.asList("A7", "F1"));
+
+			gamePlayer1.addSalvo(salvo1);
+			gamePlayer2.addSalvo(salvo2);
+			gamePlayer1.addSalvo(salvo3);
+			gamePlayer2.addSalvo(salvo4);
+
+			salvoRepository.save(salvo1);
+			salvoRepository.save(salvo2);
+			salvoRepository.save(salvo3);
+			salvoRepository.save(salvo4);
 		};
 	}
 }

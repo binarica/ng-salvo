@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,60 +26,30 @@ public class SalvoController {
 	public List<Object> getGames() {
 		return gameRepository.findAll()
 				.stream()
-				.map(this::makeGameDTO)
+				.map(Game::toDto)
 				.collect(toList());
 	}
 
 	@RequestMapping("/game_view/{gamePlayerId}")
 	public Map<String, Object> getGameView(@PathVariable Long gamePlayerId) {
 		GamePlayer gamePlayer =  gamePlayerRepository.findById(gamePlayerId).orElse(null);
+		Game game = gamePlayer.getGame();
+		List<Salvo> salvoes = game.getGamePlayers()
+				.stream()
+				.flatMap(gp -> gp.getSalvoes().stream())
+				.collect(toList());
 
-		Map<String, Object> dto = makeGameDTO(gamePlayer.getGame());
+		Map<String, Object> dto = game.toDto();
 
 		dto.put("ships", gamePlayer.getShips()
 				.stream()
-				.map(this::makeShipDTO)
+				.map(Ship::toDto)
 				.collect(toList()));
 
-		return dto;
-	}
-
-	private Map<String, Object> makeGameDTO(Game game) {
-		Map<String, Object> dto = new LinkedHashMap<>();
-
-		dto.put("id", game.getId());
-		dto.put("created", game.getDate());
-		dto.put("gamePlayers", game.getGamePlayers()
+		dto.put("salvoes", salvoes
 				.stream()
-				.map(this::makeGamePlayerDTO)
+				.map(Salvo::toDto)
 				.collect(toList()));
-
-		return dto;
-	}
-
-	private Map<String, Object> makeGamePlayerDTO(GamePlayer gamePlayer) {
-		Map<String, Object> dto = new LinkedHashMap<>();
-
-		dto.put("id", gamePlayer.getId());
-		dto.put("player", makePlayerDTO(gamePlayer.getPlayer()));
-
-		return dto;
-	}
-
-	private Map<String, Object> makePlayerDTO(Player player) {
-		Map<String, Object> dto = new LinkedHashMap<>();
-
-		dto.put("id", player.getId());
-		dto.put("email", player.getUserName());
-
-		return dto;
-	}
-
-	private Map<String, Object> makeShipDTO(Ship ship) {
-		Map<String, Object> dto = new LinkedHashMap<>();
-
-		dto.put("type", ship.getType());
-		dto.put("locations", ship.getLocations());
 
 		return dto;
 	}

@@ -18,13 +18,13 @@ import java.util.List;
 import java.util.Map;
 
 @Entity
-public class Ship {
+public class Salvo {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
 	@GenericGenerator(name = "native", strategy = "native")
 	private long id;
-	private String type;
+	private long turn;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "game_player_id")
@@ -34,10 +34,10 @@ public class Ship {
 	@Column(name = "location")
 	private List<String> locations = new ArrayList<>();
 
-	public Ship() { }
+	public Salvo() { }
 
-	public Ship(String type, List<String> locations) {
-		this.type = type;
+	public Salvo(long turn, List<String> locations) {
+		this.turn = turn;
 		this.locations = locations;
 	}
 
@@ -45,8 +45,8 @@ public class Ship {
 		return id;
 	}
 
-	public String getType() {
-		return type;
+	public long getTurn() {
+		return turn;
 	}
 
 	@JsonIgnore
@@ -65,7 +65,8 @@ public class Ship {
 	public Map<String, Object> toDto() {
 		Map<String, Object> dto = new LinkedHashMap<>();
 
-		dto.put("type", type);
+		dto.put("turn", turn);
+		dto.put("player", gamePlayer.getPlayer().getId());
 		dto.put("locations", locations);
 
 		return dto;

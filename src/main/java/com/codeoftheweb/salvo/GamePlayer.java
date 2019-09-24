@@ -11,6 +11,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 
 @Entity
@@ -31,6 +33,9 @@ public class GamePlayer {
 
 	@OneToMany(mappedBy = "gamePlayer", fetch = FetchType.EAGER)
 	Set<Ship> ships = new HashSet<>();
+
+	@OneToMany(mappedBy = "gamePlayer", fetch = FetchType.EAGER)
+	Set<Salvo> salvoes = new HashSet<>();
 
 	public GamePlayer() { }
 
@@ -58,5 +63,23 @@ public class GamePlayer {
 	public void addShip(Ship ship) {
 		ship.setGamePlayer(this);
 		ships.add(ship);
+	}
+
+	public Set<Salvo> getSalvoes() {
+		return salvoes;
+	}
+
+	public void addSalvo(Salvo salvo) {
+		salvo.setGamePlayer(this);
+		salvoes.add(salvo);
+	}
+
+	public Map<String, Object> toDto() {
+		Map<String, Object> dto = new LinkedHashMap<>();
+
+		dto.put("id", id);
+		dto.put("player", player.toDto());
+
+		return dto;
 	}
 }

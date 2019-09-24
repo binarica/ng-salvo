@@ -10,7 +10,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toList;
@@ -50,5 +52,18 @@ public class Game {
 
 	public Set<GamePlayer> getGamePlayers() {
 		return gamePlayers;
+	}
+
+	public Map<String, Object> toDto() {
+		Map<String, Object> dto = new LinkedHashMap<>();
+
+		dto.put("id", id);
+		dto.put("created", date);
+		dto.put("gamePlayers", gamePlayers
+				.stream()
+				.map(GamePlayer::toDto)
+				.collect(toList()));
+
+		return dto;
 	}
 }
