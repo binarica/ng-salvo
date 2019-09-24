@@ -1,6 +1,7 @@
 package com.codeoftheweb.salvo;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -10,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -37,6 +39,11 @@ public class GamePlayer {
 	@OneToMany(mappedBy = "gamePlayer", fetch = FetchType.EAGER)
 	Set<Salvo> salvoes = new HashSet<>();
 
+	@Nullable
+	@OneToOne(mappedBy = "gamePlayer", fetch = FetchType.EAGER)
+	@JoinColumn(name = "score_id")
+	private Score score;
+
 	public GamePlayer() { }
 
 	public GamePlayer(Game game, Player player) {
@@ -60,18 +67,12 @@ public class GamePlayer {
 		return ships;
 	}
 
-	public void addShip(Ship ship) {
-		ship.setGamePlayer(this);
-		ships.add(ship);
-	}
-
 	public Set<Salvo> getSalvoes() {
 		return salvoes;
 	}
 
-	public void addSalvo(Salvo salvo) {
-		salvo.setGamePlayer(this);
-		salvoes.add(salvo);
+	public Score getScore() {
+		return score;
 	}
 
 	public Map<String, Object> toDto() {
@@ -79,6 +80,7 @@ public class GamePlayer {
 
 		dto.put("id", id);
 		dto.put("player", player.toDto());
+		dto.put("score", getScore() != null ? getScore().getScore() : null);
 
 		return dto;
 	}

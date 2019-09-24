@@ -24,23 +24,24 @@ public class Game {
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
 	@GenericGenerator(name = "native", strategy = "native")
 	private long id;
-	private Date date;
+	private Date creationDate;
+	private Date finishDate;
 
 	@OneToMany(mappedBy = "game", fetch = FetchType.EAGER)
 	Set<GamePlayer> gamePlayers;
 
 	public Game() { }
 
-	public Game(Date date) {
-		this.date = date;
+	public Game(Date creationDate) {
+		this.creationDate = creationDate;
 	}
 
 	public long getId() {
 		return id;
 	}
 
-	public Date getDate() {
-		return date;
+	public Date getCreationDate() {
+		return creationDate;
 	}
 
 	@JsonIgnore
@@ -58,7 +59,7 @@ public class Game {
 		Map<String, Object> dto = new LinkedHashMap<>();
 
 		dto.put("id", id);
-		dto.put("created", date);
+		dto.put("created", creationDate);
 		dto.put("gamePlayers", gamePlayers
 				.stream()
 				.map(GamePlayer::toDto)

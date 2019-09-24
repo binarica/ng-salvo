@@ -36,7 +36,8 @@ public class Ship {
 
 	public Ship() { }
 
-	public Ship(String type, List<String> locations) {
+	public Ship(GamePlayer gamePlayer, String type, List<String> locations) {
+		this.gamePlayer = gamePlayer;
 		this.type = type;
 		this.locations = locations;
 	}
@@ -52,10 +53,6 @@ public class Ship {
 	@JsonIgnore
 	public GamePlayer getGamePlayer() {
 		return gamePlayer;
-	}
-
-	public void setGamePlayer(GamePlayer gamePlayer) {
-		this.gamePlayer = gamePlayer;
 	}
 
 	public List<String> getLocations() {

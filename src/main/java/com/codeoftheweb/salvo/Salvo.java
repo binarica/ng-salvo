@@ -36,7 +36,8 @@ public class Salvo {
 
 	public Salvo() { }
 
-	public Salvo(long turn, List<String> locations) {
+	public Salvo(GamePlayer gamePlayer, long turn, List<String> locations) {
+		this.gamePlayer = gamePlayer;
 		this.turn = turn;
 		this.locations = locations;
 	}
@@ -52,10 +53,6 @@ public class Salvo {
 	@JsonIgnore
 	public GamePlayer getGamePlayer() {
 		return gamePlayer;
-	}
-
-	public void setGamePlayer(GamePlayer gamePlayer) {
-		this.gamePlayer = gamePlayer;
 	}
 
 	public List<String> getLocations() {
