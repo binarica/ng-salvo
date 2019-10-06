@@ -1,15 +1,28 @@
 package com.codeoftheweb.salvo;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.GlobalAuthenticationConfigurerAdapter;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Arrays;
 import java.util.Date;
 
 @SpringBootApplication
-public class SalvoApplication {
+public class SalvoApplication extends SpringBootServletInitializer {
 
 	public static void main(String[] args) {
 		SpringApplication.run(SalvoApplication.class, args);
@@ -24,10 +37,10 @@ public class SalvoApplication {
 	                                  ScoreRepository scoreRepository) {
 		return (args) -> {
 
-			Player player1 = new Player("j.bauer@ctu.gov");
-			Player player2 = new Player("c.obrian@ctu.gov");
-			Player player3 = new Player("t.almeida@ctu.gov");
-			Player player4 = new Player("d.palmer@whitehouse.gov");
+			Player player1 = new Player("j.bauer@ctu.gov", "24");
+			Player player2 = new Player("c.obrian@ctu.gov", "42");
+			Player player3 = new Player("t.almeida@ctu.gov", "mole");
+			Player player4 = new Player("kim_bauer@gmail.com", "kb");
 
 			playerRepository.save(player1);
 			playerRepository.save(player2);
@@ -77,14 +90,64 @@ public class SalvoApplication {
 			salvoRepository.save(salvo3);
 			salvoRepository.save(salvo4);
 
-			scoreRepository.save(new Score(gamePlayer1, 1));
-			scoreRepository.save(new Score(gamePlayer2, 0));
+			scoreRepository.save(new Score(gamePlayer1, 1.0));
+			scoreRepository.save(new Score(gamePlayer2, 0.0));
 			scoreRepository.save(new Score(gamePlayer3, 0.5));
 			scoreRepository.save(new Score(gamePlayer4, 0.5));
-			scoreRepository.save(new Score(gamePlayer5, 1));
-			scoreRepository.save(new Score(gamePlayer6, 0));
+			scoreRepository.save(new Score(gamePlayer5, 1.0));
+			scoreRepository.save(new Score(gamePlayer6, 0.0));
 			scoreRepository.save(new Score(gamePlayer7, 0.5));
 			scoreRepository.save(new Score(gamePlayer8, 0.5));
 		};
+	}
+
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+	}
+}
+
+@Configuration
+class WebSecurityConfiguration extends GlobalAuthenticationConfigurerAdapter {
+
+	@Autowired
+	PlayerRepository playerRepository;
+
+	@Autowired
+	PasswordEncoder passwordEncoder;
+
+	@Override
+	public void init(AuthenticationManagerBuilder auth) throws Exception {
+		auth.userDetailsService(inputName-> {
+			Player player = playerRepository.findByUserName(inputName);
+			if (player != null) {
+				return new User(player.getUserName(), passwordEncoder.encode(player.getPassword()),
+						AuthorityUtils.createAuthorityList("USER"));
+			} else {
+				throw new UsernameNotFoundException("Unknown user: " + inputName);
+			}
+		}).passwordEncoder(passwordEncoder);
+	}
+}
+
+@Configuration
+@EnableWebSecurity
+class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+
+		http.authorizeRequests()
+				.antMatchers("/api/games", "/api/players").permitAll()
+				.antMatchers("/api/game_view/*").hasAuthority("USER")
+				.antMatchers("/rest/*").denyAll()
+				.anyRequest().fullyAuthenticated()
+				.and()
+				.formLogin().loginProcessingUrl("/api/login")
+				.and()
+				.logout().logoutUrl("/api/logout");
+
+		http.headers().frameOptions().disable();
+		http.csrf().disable();
 	}
 }

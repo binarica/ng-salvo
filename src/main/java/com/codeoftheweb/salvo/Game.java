@@ -28,20 +28,12 @@ public class Game {
 	private Date finishDate;
 
 	@OneToMany(mappedBy = "game", fetch = FetchType.EAGER)
-	Set<GamePlayer> gamePlayers;
+	private Set<GamePlayer> gamePlayers;
 
 	public Game() { }
 
 	public Game(Date creationDate) {
 		this.creationDate = creationDate;
-	}
-
-	public long getId() {
-		return id;
-	}
-
-	public Date getCreationDate() {
-		return creationDate;
 	}
 
 	@JsonIgnore

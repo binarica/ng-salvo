@@ -34,10 +34,10 @@ public class GamePlayer {
 	private Player player;
 
 	@OneToMany(mappedBy = "gamePlayer", fetch = FetchType.EAGER)
-	Set<Ship> ships = new HashSet<>();
+	private Set<Ship> ships = new HashSet<>();
 
 	@OneToMany(mappedBy = "gamePlayer", fetch = FetchType.EAGER)
-	Set<Salvo> salvoes = new HashSet<>();
+	private Set<Salvo> salvoes = new HashSet<>();
 
 	@Nullable
 	@OneToOne(mappedBy = "gamePlayer", fetch = FetchType.EAGER)
@@ -80,7 +80,7 @@ public class GamePlayer {
 
 		dto.put("id", id);
 		dto.put("player", player.toDto());
-		dto.put("score", getScore() != null ? getScore().getScore() : null);
+		dto.put("score", getScore() != null ? getScore().getScore() : 0.0);
 
 		return dto;
 	}

@@ -24,14 +24,16 @@ public class Player {
 	@GenericGenerator(name = "native", strategy = "native")
 	private long id;
 	private String userName;
+	private String password;
 
 	@OneToMany(mappedBy = "player", fetch = FetchType.EAGER)
-	Set<GamePlayer> gamePlayers;
+	private Set<GamePlayer> gamePlayers;
 
 	public Player() { }
 
-	public Player(String userName) {
+	public Player(String userName, String password) {
 		this.userName = userName;
+		this.password = password;
 	}
 
 	public long getId() {
@@ -40,6 +42,10 @@ public class Player {
 
 	public String getUserName() {
 		return userName;
+	}
+
+	public String getPassword() {
+		return password;
 	}
 
 	@JsonIgnore
