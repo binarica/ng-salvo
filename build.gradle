@@ -1,6 +1,7 @@
 plugins {
 	id 'org.springframework.boot' version '2.1.7.RELEASE'
 	id 'java'
+	id "com.moowork.node" version "1.3.1"
 }
 
 apply plugin: 'io.spring.dependency-management'
@@ -26,3 +27,21 @@ dependencies {
 	runtimeOnly 'com.h2database:h2'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
+
+node {
+	nodeModulesDir = file("$projectDir/src/main/webapp")
+}
+
+task buildClient(type: NpmTask, dependsOn: 'npmInstall') {
+	group = BasePlugin.BUILD_GROUP
+	args = ['run', 'build']
+}
+
+task buildClientWatch(type: NpmTask, dependsOn: 'npmInstall') {
+	group = 'application'
+	args = ['run', 'build-watch']
+}
+
+npmInstall.args = ['--loglevel', 'info']
+
+processResources.dependsOn 'buildClient'

@@ -1,0 +1,23 @@
+<app-login></app-login>
+<br>
+<h2>Leaderboard</h2>
+<table class="table table-bordered">
+	<thead>
+		<tr>
+			<th scope="col">Name</th>
+			<th scope="col">Total</th>
+			<th scope="col">Won</th>
+			<th scope="col">Lost</th>
+			<th scope="col">Tied</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr *ngFor="let player of players">
+			<td>{{ player.userName }}</td>
+			<td>{{ player.total }}</td>
+			<td>{{ player.won }}</td>
+			<td>{{ player.lost }}</td>
+			<td>{{ player.tied }}</td>
+		</tr>
+	</tbody>
+</table>

@@ -42,23 +42,6 @@ public class Ship {
 		this.locations = locations;
 	}
 
-	public long getId() {
-		return id;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	@JsonIgnore
-	public GamePlayer getGamePlayer() {
-		return gamePlayer;
-	}
-
-	public List<String> getLocations() {
-		return locations;
-	}
-
 	public Map<String, Object> toDto() {
 		Map<String, Object> dto = new LinkedHashMap<>();
 

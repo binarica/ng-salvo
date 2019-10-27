@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -20,7 +20,6 @@ import java.util.Map;
 
 import static java.util.stream.Collectors.toList;
 
-@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/api")
 public class SalvoController {
@@ -34,10 +33,13 @@ public class SalvoController {
 	@Autowired
 	private PlayerRepository playerRepository;
 
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
 	@RequestMapping("/games")
 	public Map<String, Object> getGames() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		Player player = getLoggedPlayer(authentication);
+		Player player = getCurrentPlayer(authentication);
 
 		Map<String, Object> dto = new LinkedHashMap<>();
 
@@ -90,7 +92,7 @@ public class SalvoController {
 		if (player != null) {
 			return new ResponseEntity<>(makeMap("error", "Name in use"), HttpStatus.CONFLICT);
 		}
-		Player newPlayer = playerRepository.save(new Player(username, password));
+		Player newPlayer = playerRepository.save(new Player(username, passwordEncoder.encode(password)));
 		return new ResponseEntity<>(makeMap("username", newPlayer.getUserName()), HttpStatus.CREATED);
 	}
 
@@ -100,7 +102,7 @@ public class SalvoController {
 		return map;
 	}
 
-	private Player getLoggedPlayer(Authentication authentication) {
+	private Player getCurrentPlayer(Authentication authentication) {
 		return !(authentication instanceof AnonymousAuthenticationToken)
 				? playerRepository.findByUserName(authentication.getName())
 				: null;

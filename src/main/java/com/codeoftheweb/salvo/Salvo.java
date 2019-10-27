@@ -1,6 +1,5 @@
 package com.codeoftheweb.salvo;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Column;
@@ -40,23 +39,6 @@ public class Salvo {
 		this.gamePlayer = gamePlayer;
 		this.turn = turn;
 		this.locations = locations;
-	}
-
-	public long getId() {
-		return id;
-	}
-
-	public long getTurn() {
-		return turn;
-	}
-
-	@JsonIgnore
-	public GamePlayer getGamePlayer() {
-		return gamePlayer;
-	}
-
-	public List<String> getLocations() {
-		return locations;
 	}
 
 	public Map<String, Object> toDto() {

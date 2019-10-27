@@ -29,14 +29,6 @@ public class Score {
 		this.score = score;
 	}
 
-	public long getId() {
-		return id;
-	}
-
-	public GamePlayer getGamePlayer() {
-		return gamePlayer;
-	}
-
 	public double getScore() {
 		return score;
 	}

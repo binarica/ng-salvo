@@ -1,0 +1,16 @@
+<table class="table table-bordered text-center">
+	<thead>
+		<tr>
+			<th></th>
+			<th scope="col" *ngFor="let col of cols">{{ col }}</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr *ngFor="let row of rows">
+			<th scope="row">{{ row }}</th>
+			<td *ngFor="let col of cols">
+				<app-cell location="{{ row }}{{ col }}"></app-cell>
+			</td>
+		</tr>
+	</tbody>
+</table>

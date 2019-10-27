@@ -51,10 +51,6 @@ public class GamePlayer {
 		this.player = player;
 	}
 
-	public long getId() {
-		return id;
-	}
-
 	public Game getGame() {
 		return game;
 	}
@@ -71,16 +67,12 @@ public class GamePlayer {
 		return salvoes;
 	}
 
-	public Score getScore() {
-		return score;
-	}
-
 	public Map<String, Object> toDto() {
 		Map<String, Object> dto = new LinkedHashMap<>();
 
 		dto.put("id", id);
 		dto.put("player", player.toDto());
-		dto.put("score", getScore() != null ? getScore().getScore() : 0.0);
+		dto.put("score", score != null ? score.getScore() : 0.0);
 
 		return dto;
 	}
