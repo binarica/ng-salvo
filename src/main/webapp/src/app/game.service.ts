@@ -10,17 +10,35 @@ import { catchError } from 'rxjs/operators';
 
 export class GameService {
 
-	// TODO: Get Game Player ID from current Player when joining a game
-	gamePlayerId: number = 1;
+	serviceUrl = '/api';
 
 	constructor(private http: HttpClient) { }
 
-	getData(): Observable<Game> {
-		return this.http.get<Game>(`/api/game_view/${this.gamePlayerId}`)
-		.pipe(catchError(response => throwError(response.error.error)));
+	getGames(): Observable<any> {
+		return this.http.get<any>(`${this.serviceUrl}/games`);
 	}
 
-	getGamePlayerId(): number {
-		return this.gamePlayerId;
+	createGame(): Observable<any> {
+		return this.http.post(`${this.serviceUrl}/games`, {})
+			.pipe(catchError(this.handleError));
+	}
+
+	joinGame(gameId: number): Observable<any> {
+		return this.http.post(`${this.serviceUrl}/games/${gameId}/players`, {})
+			.pipe(catchError(this.handleError));
+	}
+
+	getGame(gpid: number): Observable<Game> {
+		return this.http.get<Game>(`${this.serviceUrl}/game_view/${gpid}`)
+			.pipe(catchError(this.handleError));
+	}
+
+	handleError(response) {
+		let errorMessage = '';
+		if (response.error) {
+			errorMessage = `Error: ${response.error}\nError Code: ${response.status}`;
+			window.alert(errorMessage);
+		}
+		return throwError(errorMessage);
 	}
 }

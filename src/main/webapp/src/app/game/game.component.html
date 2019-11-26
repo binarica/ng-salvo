@@ -1,13 +1,13 @@
 <div *ngIf="game; else login">
 	<div class="row">
 			<div class="col">
-				<h2 class="text-center">{{ players[0] }} (you) vs {{ players[1] }}</h2>
+				<h2 class="text-center">{{ gameInfo }}</h2>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col">
 				<h3 class="text-center">Your Board</h3>
-				<app-grid></app-grid>
+				<app-grid [ships]="game.ships"></app-grid>
 			</div>
 			<div class="col">
 				<h3 class="text-center">Computer's Board</h3>

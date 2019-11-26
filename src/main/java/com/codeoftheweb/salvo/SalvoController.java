@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static java.util.stream.Collectors.toList;
 
@@ -36,10 +38,9 @@ public class SalvoController {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
-	@RequestMapping("/games")
+	@RequestMapping(path = "/games", method = RequestMethod.GET)
 	public Map<String, Object> getGames() {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		Player player = getCurrentPlayer(authentication);
+		Player player = getCurrentPlayer();
 
 		Map<String, Object> dto = new LinkedHashMap<>();
 
@@ -55,11 +56,62 @@ public class SalvoController {
 		return dto;
 	}
 
+	@RequestMapping(path = "/games", method = RequestMethod.POST)
+	public ResponseEntity<Object> createGame() {
+		// gets the current user
+		Player player = getCurrentPlayer();
+
+		// if there is none, it should send an Unauthorized response
+		if (player == null) {
+			return new ResponseEntity<>("Player not found", HttpStatus.UNAUTHORIZED);
+		}
+
+		// creates and saves a new game
+		Game game = gameRepository.save(new Game(new Date()));
+
+		// creates and saves a new game player for this game and the current user
+		GamePlayer gamePlayer = gamePlayerRepository.save(new GamePlayer(game, player));
+
+		// send a Created response, with JSON containing the new game player ID, e.g., { "gpid": 32 }
+		return new ResponseEntity<>(makeMap("gamePlayerId", gamePlayer.getId()), HttpStatus.CREATED);
+	}
+
+	@RequestMapping(path = "/games/{gameId}/players", method = RequestMethod.POST)
+	public ResponseEntity<Object> joinGame(@PathVariable Long gameId) {
+		Player player = getCurrentPlayer();
+		if (player == null) {
+			return new ResponseEntity<>("You must be logged in first", HttpStatus.UNAUTHORIZED);
+		}
+
+		Game game = gameRepository.findById(gameId).orElse(null);
+		if (game == null) {
+			return new ResponseEntity<>(String.format("Game %d does not exist", gameId), HttpStatus.NOT_FOUND);
+		}
+
+		Set<GamePlayer> gamePlayers = game.getGamePlayers();
+		if (gamePlayers.size() > 1) {
+			return new ResponseEntity<>("Game is full", HttpStatus.FORBIDDEN);
+		}
+
+		Long playerId = player.getId();
+		if (gamePlayers.stream().anyMatch(gp -> playerId.equals(gp.getPlayer().getId()))) {
+			return new ResponseEntity<>("You can't play against yourself!", HttpStatus.FORBIDDEN);
+		}
+
+		GamePlayer newGamePlayer = gamePlayerRepository.save(new GamePlayer(game, player));
+		return new ResponseEntity<>(makeMap("gamePlayerId", newGamePlayer.getId()), HttpStatus.CREATED);
+	}
+
 	@RequestMapping("/game_view/{gamePlayerId}")
-	public ResponseEntity<Map<String, Object>> getGameView(@PathVariable Long gamePlayerId) {
+	public ResponseEntity<Object> getGameView(@PathVariable Long gamePlayerId) {
 		GamePlayer gamePlayer =  gamePlayerRepository.findById(gamePlayerId).orElse(null);
 		if (gamePlayer == null) {
-			return new ResponseEntity<>(makeMap("error", "GamePlayer not found"), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>("GamePlayer not found", HttpStatus.NOT_FOUND);
+		}
+
+		Player player = getCurrentPlayer();
+		if (player != null && !player.getId().equals(gamePlayer.getPlayer().getId())) {
+			return new ResponseEntity<>(String.format("Current user is not the game player referenced by the ID %d", gamePlayerId), HttpStatus.UNAUTHORIZED);
 		}
 
 		Game game = gamePlayer.getGame();
@@ -84,16 +136,16 @@ public class SalvoController {
 	}
 
 	@RequestMapping(path = "/players", method = RequestMethod.POST)
-	public ResponseEntity<Map<String, Object>> createPlayer(@RequestParam String username, @RequestParam String password) {
+	public ResponseEntity<Object> createPlayer(@RequestParam String username, @RequestParam String password) {
 		if (username.isEmpty()) {
-			return new ResponseEntity<>(makeMap("error", "No name"), HttpStatus.FORBIDDEN);
+			return new ResponseEntity<>("No name", HttpStatus.FORBIDDEN);
 		}
 		Player player = playerRepository.findByUserName(username);
 		if (player != null) {
-			return new ResponseEntity<>(makeMap("error", "Name in use"), HttpStatus.CONFLICT);
+			return new ResponseEntity<>("Name in use", HttpStatus.CONFLICT);
 		}
 		Player newPlayer = playerRepository.save(new Player(username, passwordEncoder.encode(password)));
-		return new ResponseEntity<>(makeMap("username", newPlayer.getUserName()), HttpStatus.CREATED);
+		return new ResponseEntity<>(newPlayer.toDto(), HttpStatus.CREATED);
 	}
 
 	private Map<String, Object> makeMap(String key, Object value) {
@@ -102,7 +154,8 @@ public class SalvoController {
 		return map;
 	}
 
-	private Player getCurrentPlayer(Authentication authentication) {
+	private Player getCurrentPlayer() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		return !(authentication instanceof AnonymousAuthenticationToken)
 				? playerRepository.findByUserName(authentication.getName())
 				: null;

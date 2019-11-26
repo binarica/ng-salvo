@@ -22,8 +22,8 @@ public class Salvo {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
 	@GenericGenerator(name = "native", strategy = "native")
-	private long id;
-	private long turn;
+	private Long id;
+	private Long turn;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "game_player_id")
@@ -35,7 +35,7 @@ public class Salvo {
 
 	public Salvo() { }
 
-	public Salvo(GamePlayer gamePlayer, long turn, List<String> locations) {
+	public Salvo(GamePlayer gamePlayer, Long turn, List<String> locations) {
 		this.gamePlayer = gamePlayer;
 		this.turn = turn;
 		this.locations = locations;

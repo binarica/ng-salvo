@@ -1,5 +1,3 @@
-<app-login></app-login>
-<br>
 <h2>Leaderboard</h2>
 <table class="table table-bordered">
 	<thead>
@@ -13,7 +11,7 @@
 	</thead>
 	<tbody>
 		<tr *ngFor="let player of players">
-			<td>{{ player.userName }}</td>
+			<td>{{ player.name }}</td>
 			<td>{{ player.total }}</td>
 			<td>{{ player.won }}</td>
 			<td>{{ player.lost }}</td>

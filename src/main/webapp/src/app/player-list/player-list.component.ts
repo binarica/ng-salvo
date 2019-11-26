@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { PlayerService } from '../player.service';
+import { GameService } from '../game.service';
 import { Player } from '../player';
+
 
 @Component({
 	selector: 'app-player-list',
@@ -13,12 +14,14 @@ export class PlayerListComponent implements OnInit {
 	gamePlayers: any = [];
 	players: Player[];
 
-	constructor(private playerService: PlayerService) { }
+	constructor(private gameService: GameService) { }
 
 	ngOnInit() {
-		this.playerService.getGamesData().subscribe(games => {
-			this.gamePlayers = games.flatMap(game => game.gamePlayers);
-			this.players = this.getPlayersList();
+		this.gameService.getGames()
+			.subscribe(data => {
+				const games = data.games;
+				this.gamePlayers = games.flatMap(game => game.gamePlayers);
+				this.players = this.getPlayersList();
 		});
 	}
 
@@ -31,7 +34,7 @@ export class PlayerListComponent implements OnInit {
 
 		const createPlayerInstance = player => (
 			new Player(
-				player.id, 
+				player.id,
 				player.email,
 				this.getPlayerScores(player)
 			)

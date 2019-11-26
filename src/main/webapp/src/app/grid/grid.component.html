@@ -8,7 +8,7 @@
 	<tbody>
 		<tr *ngFor="let row of rows">
 			<th scope="row">{{ row }}</th>
-			<td *ngFor="let col of cols">
+			<td *ngFor="let col of cols" [className]="grid.get(row + col)">
 				<app-cell location="{{ row }}{{ col }}"></app-cell>
 			</td>
 		</tr>

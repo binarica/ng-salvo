@@ -1,4 +1,4 @@
-<div *ngIf="currentPlayer; else login">
+<div *ngIf="isLoggedIn(); else login">
 	<h3>Hello {{ currentPlayer.email }}!</h3>
 	<button type="button" class="btn btn-secondary" (click)="logout()">Log Out</button>
 </div>

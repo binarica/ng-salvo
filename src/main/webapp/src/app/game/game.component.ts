@@ -1,38 +1,39 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+
 import { GameService } from '../game.service';
 import { Game } from '../game';
-import { Grid } from '../grid';
 
 @Component({
 	selector: 'app-game',
 	templateUrl: './game.component.html',
-	styleUrls: ['./game.component.css'],
-	providers: [GameService]
+	styleUrls: ['./game.component.css']
 })
 
 export class GameComponent implements OnInit {
 
 	game: Game = null;
-	grids: Grid[];
+	gameInfo: string;
 
-	players: string[] = [];
-
-	constructor(private gameService: GameService) { }
+	constructor(
+		private route: ActivatedRoute,
+		private gameService: GameService
+	) {}
 
 	ngOnInit() {
-		this.gameService.getData().subscribe(data => {
-			this.game = data;
-			const gamePlayerId = this.gameService.getGamePlayerId();
-			
-			this.players = this.game.gamePlayers
-			.sort(gamePlayer => gamePlayer.id == gamePlayerId ? -1 : 1)
-			.map(gamePlayer => gamePlayer.player.email);
+		this.getGame();
+	}
 
-			const salvoes = this.game.salvoes;
-			
-			salvoes.forEach(salvo => {
-				// TODO: Add ships and salvoes to grids
+	getGame() {
+		const id = +this.route.snapshot.paramMap.get('gp');
+
+		this.gameService.getGame(id)
+			.subscribe(game => {
+				this.game = game;
+				this.gameInfo = game.gamePlayers
+					.sort(gamePlayer => gamePlayer.id === id ? -1 : 1)
+					.map(gamePlayer => gamePlayer.player.email)
+					.join(' (you) vs ');
 			});
-		});
 	}
 }

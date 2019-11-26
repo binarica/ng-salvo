@@ -1,6 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import { GameService } from '../game.service';
-import { Game } from '../game';
+import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
 	selector: 'app-grid',
@@ -10,16 +8,35 @@ import { Game } from '../game';
 
 export class GridComponent implements OnInit {
 
-	game: Game;
+	@Input() ships = [];
+	@Input() salvoes = [];
 
-	rows = [ "A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
+	rows = [ 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J' ];
 	cols = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ];
 
-	constructor(private gameService: GameService) { }
+	grid = new Map();
+
+	constructor() { }
 
 	ngOnInit() {
-		this.gameService.getData().subscribe(data => {
-			this.game = data;
-		});
+		this.addShips();
+		this.addSalvoes();
+	}
+
+	addShips() {
+		for (const ship of this.ships) {
+			const name = 'ship-'.concat(ship.type.replace(/\s/g, '-').toLowerCase());
+			for (const location of ship.locations) {
+				this.grid.set(location, name);
+			}
+		}
+	}
+
+	addSalvoes() {
+		for (const salvo of this.salvoes) {
+			for (const location of salvo.locations) {
+				this.grid.set(location, 'salvo');
+			}
+		}
 	}
 }

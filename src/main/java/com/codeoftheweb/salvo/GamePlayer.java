@@ -23,7 +23,7 @@ public class GamePlayer {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
 	@GenericGenerator(name = "native", strategy = "native")
-	private long id;
+	private Long id;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "game_id")
@@ -49,6 +49,10 @@ public class GamePlayer {
 	public GamePlayer(Game game, Player player) {
 		this.game = game;
 		this.player = player;
+	}
+
+	public Long getId() {
+		return id;
 	}
 
 	public Game getGame() {

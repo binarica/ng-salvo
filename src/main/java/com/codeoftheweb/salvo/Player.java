@@ -22,7 +22,7 @@ public class Player {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
 	@GenericGenerator(name = "native", strategy = "native")
-	private long id;
+	private Long id;
 	private String userName;
 	private String password;
 
@@ -36,7 +36,7 @@ public class Player {
 		this.password = password;
 	}
 
-	public long getId() {
+	public Long getId() {
 		return id;
 	}
 
@@ -62,5 +62,9 @@ public class Player {
 		dto.put("email", userName);
 
 		return dto;
+	}
+
+	public String toJson() {
+		return String.format("{ \"id\": %d, \"email\": \"%s\" }", id, userName);
 	}
 }

@@ -12,6 +12,7 @@ import { GridComponent } from './grid/grid.component';
 import { CellComponent } from './cell/cell.component';
 import { LoginComponent } from './login/login.component';
 import { FormsModule } from '@angular/forms';
+import { GamesComponent } from './games/games.component';
 
 @NgModule({
 	declarations: [
@@ -20,7 +21,8 @@ import { FormsModule } from '@angular/forms';
 		GameComponent,
 		GridComponent,
 		CellComponent,
-		LoginComponent
+		LoginComponent,
+		GamesComponent
 	],
 	imports: [
 		AppRoutingModule,

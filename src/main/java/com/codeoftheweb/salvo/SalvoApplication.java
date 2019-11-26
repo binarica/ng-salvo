@@ -17,14 +17,15 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.WebAttributes;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @SpringBootApplication
 public class SalvoApplication extends SpringBootServletInitializer {
@@ -139,6 +140,9 @@ class WebSecurityConfiguration extends GlobalAuthenticationConfigurerAdapter {
 @EnableWebSecurity
 class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
+	@Autowired
+	PlayerRepository playerRepository;
+
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 
@@ -163,19 +167,27 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.exceptionHandling().authenticationEntryPoint((req, res, exc) -> res.sendError(HttpServletResponse.SC_UNAUTHORIZED));
 
 		// if login is successful, just clear the flags asking for authentication
-		http.formLogin().successHandler((req, res, auth) -> clearAuthenticationAttributes(req));
+		http.formLogin().successHandler(successHandler());
 
 		// if login fails, just send an authentication failure response
-		http.formLogin().failureHandler((req, res, exc) -> res.sendError(HttpServletResponse.SC_UNAUTHORIZED));
+		http.formLogin().failureHandler(failureHandler());
 
 		// if logout is successful, just send a success response
 		http.logout().logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler());
 	}
 
-	private void clearAuthenticationAttributes(HttpServletRequest request) {
-		HttpSession session = request.getSession(false);
-		if (session != null) {
-			session.removeAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
-		}
+	private AuthenticationSuccessHandler successHandler() {
+		return (httpServletRequest, httpServletResponse, authentication) -> {
+			Player player = playerRepository.findByUserName(authentication.getName());
+			httpServletResponse.getWriter().append(player.toJson());
+			httpServletResponse.setStatus(HttpServletResponse.SC_OK);
+		};
+	}
+
+	private AuthenticationFailureHandler failureHandler() {
+		return (httpServletRequest, httpServletResponse, authentication) -> {
+			httpServletResponse.getWriter().append(authentication.getMessage());
+			httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+		};
 	}
 }

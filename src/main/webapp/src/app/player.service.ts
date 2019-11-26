@@ -16,11 +16,7 @@ export class PlayerService {
 
 	getCurrentPlayer(): Observable<any> {
 		return this.http.get<any>(`${this.serviceUrl}/games`)
-		.pipe(map(data => {
-			if (data != null) {
-				return data.player;
-			}
-		}));
+		.pipe(map(data => data.player));
 	}
 
 	getGamesData(): Observable<any> {
@@ -28,7 +24,7 @@ export class PlayerService {
 		.pipe(map(data => data.games));
 	}
 
-	login(data: FormData) {
+	login(data: FormData): Observable<any> {
 		return this.http.post(`${this.serviceUrl}/login`, data, {
 			withCredentials: true
 		}).pipe(catchError(this.handleError));
@@ -48,8 +44,8 @@ export class PlayerService {
 	handleError(response) {
 		let errorMessage = '';
 		if (response.error) {
-			// TODO: Use NG Bootstrap alerts to handle server error messages
-			errorMessage = `Error: ${response.error.error}\nError Code: ${response.status}`;
+			// TODO: Use ngb-modal instead of window.alert to handle server error messages, move to global class
+			errorMessage = `Error: ${response.error}\nError Code: ${response.status}`;
 			window.alert(errorMessage);
 		}
 		return throwError(errorMessage);

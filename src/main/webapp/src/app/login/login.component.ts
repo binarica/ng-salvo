@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { PlayerService } from '../player.service';
 import { NgForm } from '@angular/forms';
 import { Player } from '../player';
@@ -9,45 +9,49 @@ import { Player } from '../player';
 	styleUrls: ['./login.component.css']
 })
 
-export class LoginComponent {
+export class LoginComponent implements OnInit {
 
 	currentPlayer: Player = null;
-	submitted = false;
 
 	constructor(private playerService: PlayerService) { }
 
 	ngOnInit() {
-		// TODO: Add loading overlay animation before service call is completed
+		// TODO: Add loading overlay animation before service call is completed (in the service)
 		this.playerService.getCurrentPlayer()
-		.subscribe(player => this.currentPlayer = player);
+			.subscribe(player => this.currentPlayer = player);
 	}
 
 	onSubmit(loginForm: NgForm) {
-		this.submitted = true;
-
 		this.playerService.login(this.getFormData(loginForm))
-		.subscribe(_ => {
-			this.playerService.getCurrentPlayer()
-			.subscribe(player => this.currentPlayer = player);
-		});
+			.subscribe(player => {
+				this.currentPlayer = player;
+				window.location.reload();
+			});
 	}
 
 	logout() {
 		this.playerService.logout()
-		.subscribe(_ => this.currentPlayer = null);
+			.subscribe(() => {
+				this.currentPlayer = null;
+				window.location.reload();
+			});
 	}
 
 	createNewPlayer(loginForm: NgForm) {
 		const newPlayer = this.getFormData(loginForm);
 
 		this.playerService.createPlayer(newPlayer)
-		.subscribe(_ => {
-			this.playerService.login(newPlayer)
-			.subscribe(_ => {
-				this.playerService.getCurrentPlayer()
-				.subscribe(player => this.currentPlayer = player);
+			.subscribe(() => {
+				this.playerService.login(newPlayer)
+					.subscribe(player => {
+						this.currentPlayer = player;
+						window.location.reload();
+					});
 			});
-		});
+	}
+
+	isLoggedIn() {
+		return this.currentPlayer != null;
 	}
 
 	getFormData(form: NgForm) {
