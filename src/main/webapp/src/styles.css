@@ -1,1 +1,56 @@
 /* You can add global styles to this file, and also import other style files */
+
+.modal > .modal-dialog {
+	animation-name: modal-fade;
+	animation-duration: 0.3s;
+}
+
+@keyframes modal-fade {
+	from {
+		top: -100px;
+		opacity: 0;
+	}
+	to {
+		top: 0;
+		opacity: 1;
+	}
+}
+
+.ship {
+	height: 3em;
+	background-size: 100% 100%;
+}
+
+td .ship {
+	margin: -0.75em;
+}
+
+.handle {
+	cursor: move;
+}
+
+.ship-patrol-boat {
+	background-image: url(assets/images/ships/patrol-boat.png);
+	width: 6em;
+}
+
+.ship-destroyer {
+	background-image: url(assets/images/ships/destroyer.png);
+	width: 9rem;
+}
+
+.ship-submarine {
+	background-image: url(assets/images/ships/submarine.png);
+	width: 9em;
+}
+
+
+.ship-battleship {
+	background-image: url(assets/images/ships/battleship.png);
+	width: 12em;
+}
+
+.ship-aircraft-carrier {
+	background-image: url(assets/images/ships/aircraft-carrier.png);
+	width: 15em;
+}

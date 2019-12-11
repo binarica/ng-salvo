@@ -1,6 +1,9 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { PlayerService } from '../player.service';
+import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+
+import { AuthService } from '../auth.service';
+import { PlayerService } from '../player.service';
 import { Player } from '../player';
 
 @Component({
@@ -13,7 +16,7 @@ export class LoginComponent implements OnInit {
 
 	currentPlayer: Player = null;
 
-	constructor(private playerService: PlayerService) { }
+	constructor(private authService: AuthService, private playerService: PlayerService, private modalService: NgbModal) { }
 
 	ngOnInit() {
 		// TODO: Add loading overlay animation before service call is completed (in the service)
@@ -21,19 +24,23 @@ export class LoginComponent implements OnInit {
 			.subscribe(player => this.currentPlayer = player);
 	}
 
+	openModal(content) {
+		this.modalService.open(content, { centered: true });
+	}
+
 	onSubmit(loginForm: NgForm) {
-		this.playerService.login(this.getFormData(loginForm))
+		this.authService.login(this.getFormData(loginForm))
 			.subscribe(player => {
 				this.currentPlayer = player;
-				window.location.reload();
+				this.refresh();
 			});
 	}
 
 	logout() {
-		this.playerService.logout()
+		this.authService.logout()
 			.subscribe(() => {
 				this.currentPlayer = null;
-				window.location.reload();
+				this.refresh();
 			});
 	}
 
@@ -42,10 +49,10 @@ export class LoginComponent implements OnInit {
 
 		this.playerService.createPlayer(newPlayer)
 			.subscribe(() => {
-				this.playerService.login(newPlayer)
+				this.authService.login(newPlayer)
 					.subscribe(player => {
 						this.currentPlayer = player;
-						window.location.reload();
+						this.refresh();
 					});
 			});
 	}
@@ -58,5 +65,9 @@ export class LoginComponent implements OnInit {
 		const formData = new FormData();
 		Object.keys(form.value).forEach(key => formData.append(key, form.value[key]));
 		return formData;
+	}
+
+	refresh() {
+		location.reload();
 	}
 }

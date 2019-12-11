@@ -1,8 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { Observable } from 'rxjs';
+
 import { Game } from './game';
-import { catchError } from 'rxjs/operators';
+import { Ship } from './ship';
+
+import { environment } from '../environments/environment';
 
 @Injectable({
 	providedIn: 'root'
@@ -10,35 +13,25 @@ import { catchError } from 'rxjs/operators';
 
 export class GameService {
 
-	serviceUrl = '/api';
-
 	constructor(private http: HttpClient) { }
 
 	getGames(): Observable<any> {
-		return this.http.get<any>(`${this.serviceUrl}/games`);
+		return this.http.get<any>(`${environment.apiUrl}/games`);
 	}
 
 	createGame(): Observable<any> {
-		return this.http.post(`${this.serviceUrl}/games`, {})
-			.pipe(catchError(this.handleError));
+		return this.http.post(`${environment.apiUrl}/games`, {});
 	}
 
 	joinGame(gameId: number): Observable<any> {
-		return this.http.post(`${this.serviceUrl}/games/${gameId}/players`, {})
-			.pipe(catchError(this.handleError));
+		return this.http.post(`${environment.apiUrl}/games/${gameId}/players`, {});
 	}
 
-	getGame(gpid: number): Observable<Game> {
-		return this.http.get<Game>(`${this.serviceUrl}/game_view/${gpid}`)
-			.pipe(catchError(this.handleError));
+	getGame(gamePlayerId: number): Observable<Game> {
+		return this.http.get<Game>(`${environment.apiUrl}/game_view/${gamePlayerId}`);
 	}
 
-	handleError(response) {
-		let errorMessage = '';
-		if (response.error) {
-			errorMessage = `Error: ${response.error}\nError Code: ${response.status}`;
-			window.alert(errorMessage);
-		}
-		return throwError(errorMessage);
+	addShips(gamePlayerId: number, ships: Ship[]): Observable<any> {
+		return this.http.post(`${environment.apiUrl}/games/players/${gamePlayerId}/ships`, ships);
 	}
 }

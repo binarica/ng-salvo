@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 
 import { GameService } from '../game.service';
 import { Game } from '../game';
+import { Ship } from '../ship';
 
 @Component({
 	selector: 'app-game',
@@ -13,7 +14,8 @@ import { Game } from '../game';
 export class GameComponent implements OnInit {
 
 	game: Game = null;
-	gameInfo: string;
+	players: string[] = [];
+	ships: Ship[];
 
 	constructor(
 		private route: ActivatedRoute,
@@ -30,10 +32,15 @@ export class GameComponent implements OnInit {
 		this.gameService.getGame(id)
 			.subscribe(game => {
 				this.game = game;
-				this.gameInfo = game.gamePlayers
+				this.players = game.gamePlayers
 					.sort(gamePlayer => gamePlayer.id === id ? -1 : 1)
-					.map(gamePlayer => gamePlayer.player.email)
-					.join(' (you) vs ');
+					.map(gamePlayer => gamePlayer.player.email);
+				this.ships = game.ships;
 			});
+	}
+
+	isGameStarted() {
+		// TODO: Toggle once finished placing ships
+		return false;
 	}
 }

@@ -7,7 +7,7 @@ import { Component, OnInit, Input } from '@angular/core';
 })
 
 export class CellComponent implements OnInit {
-	@Input() location: string;
+	@Input() shipData;
 
 	constructor() { }
 
@@ -15,4 +15,20 @@ export class CellComponent implements OnInit {
 
 	}
 
+	getCssClass() {
+		return 'ship-'.concat(this.parseJSON(this.shipData).type.replace(/\s/, '-').toLowerCase());
+	}
+
+	getOrientation() {
+		const ship = this.parseJSON(this.shipData);
+		return ship.locations[0].charAt(0) === ship.locations[1].charAt(0) ? 'horizontal' : 'vertical';
+	}
+
+	parseJSON(json) {
+		try {
+			return JSON.parse(this.shipData);
+		} catch (e) {
+			return '';
+		}
+	}
 }

@@ -35,32 +35,37 @@ export class GamesComponent implements OnInit {
 
 	createGame() {
 		this.gameService.createGame()
-			.subscribe(res => {
-				this.router
-					.navigate(['/game', { gp: res.gamePlayerId }])
-					.then();
+			.subscribe(gpid => {
+				this.redirectToGamePage(gpid);
 			});
 	}
 
 	joinGame(gameId: number) {
 		this.gameService.joinGame(gameId)
-			.subscribe(res => {
-				this.router
-					.navigate(['/game', { gp: res.gamePlayerId }])
-					.then();
+			.subscribe(gpid => {
+				this.redirectToGamePage(gpid);
 			});
 	}
 
-	enterGame(game) {
+	reenterGame(game) {
 		const gpid = game.gamePlayers.find(gamePlayer => gamePlayer.player.id === this.player.id).id;
+		this.redirectToGamePage(gpid);
+	}
 
+	redirectToGamePage(gpid: number) {
 		this.router
 			.navigate(['/game', { gp: gpid }])
 			.then();
 	}
 
-	isOwnGame(game) {
-		return this.player != null && (game.gamePlayers.filter(gamePlayer => gamePlayer.player.id === this.player.id).length > 0);
+	redirectToHomePage() {
+		this.router
+			.navigate(['/'])
+			.then();
+	}
+
+	hasJoined(game) {
+		return this.player != null && (game.gamePlayers.some(gamePlayer => gamePlayer.player.id === this.player.id));
 	}
 
 	isGameFull(game) {

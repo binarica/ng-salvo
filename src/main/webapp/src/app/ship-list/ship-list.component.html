@@ -1,0 +1,25 @@
+<h5>Click and drag ships to the desired location on the grid.</h5>
+<h6>Choose an orientation for the ship:</h6>
+
+<div class="form-check-inline">
+	<label class="form-check-label">
+		<input type="radio" class="form-check-input" name="orientation" (click)="orientation='horizontal'" checked>Horizontal
+	</label>
+</div>
+<div class="form-check-inline">
+	<label class="form-check-label">
+		<input type="radio" class="form-check-input" name="orientation" (click)="orientation='vertical'">Vertical
+	</label>
+</div>
+
+<div class="card bg-light">
+	<div class="card-body">
+		<div *ngFor="let ship of shipTypes">
+			<div class="ship {{getClassName(ship.type)}}" [attr.data-ship-type]="getDataAttr(ship)"
+			     draggable="true" (dragstart)="onDragStart($event)">
+				<span class="handle">&#8942;</span>
+			</div>
+		</div>
+	</div>
+</div>
+

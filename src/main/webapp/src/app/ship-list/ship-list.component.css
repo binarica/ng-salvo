@@ -1,0 +1,9 @@
+.card-body {
+	background: #aaa url(../../assets/images/dock-texture.jpg);
+}
+
+.ship {
+	background-color: #eee;
+	border: 2px solid #009;
+	margin: 0.5em;
+}

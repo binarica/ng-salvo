@@ -1,24 +1,26 @@
-<app-login></app-login>
-<br>
-<h2>Games</h2>
-<button type="button" class="btn btn-info" (click)="createGame()">New Game</button>
+<div class="row mt-3">
+	<div class="col-7">
+		<h2>Games <button type="button" class="btn btn-info btn-sm mx-2" (click)="createGame()">Create Game</button></h2>
 
-<div class="row my-3">
-	<ol>
-		<li *ngFor="let game of games">
-			<p>
+		<ol>
+			<li *ngFor="let game of games">
+				<p>
 
-				<a *ngIf="isOwnGame(game); else nolink" [routerLink]="" (click)="enterGame(game)">
-					{{ getItemHtml(game) }}
-				</a>
+					<a *ngIf="hasJoined(game); else nolink" [routerLink]="" (click)="reenterGame(game)">
+						{{ getItemHtml(game) }}
+					</a>
 
-				<ng-template #nolink> {{ getItemHtml(game) }} </ng-template>
+					<ng-template #nolink> {{ getItemHtml(game) }} </ng-template>
 
-				<button type="button" class="btn btn-light btn-sm mx-2" (click)="joinGame(game.id)">Join</button>
+					<button *ngIf="!hasJoined(game)" type="button" class="btn btn-outline-primary btn-sm mx-2" (click)="joinGame(game.id)">Join Game</button>
 
-			</p>
-		</li>
-	</ol>
+				</p>
+			</li>
+		</ol>
+	</div>
+
+	<div class="col-5">
+		<app-player-list></app-player-list>
+	</div>
+
 </div>
-
-<app-player-list></app-player-list>

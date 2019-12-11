@@ -1,11 +1,15 @@
-.ship-patrol-boat {
-	background: #00C;
+table {
+	background: url(../../assets/images/ocean.gif) center / cover;
+	border: 2px solid #888;
+	table-layout: fixed;
 }
 
-.ship-destroyer {
-	background: #003;
+th {
+	background: #aaa url(../../assets/images/dock-texture.jpg);
 }
 
-.ship-submarine {
-	background: #066;
+
+td.busy {
+	border: 2px solid #009;
+	background:  #eee;
 }

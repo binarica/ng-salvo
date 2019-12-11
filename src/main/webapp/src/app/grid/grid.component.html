@@ -1,3 +1,8 @@
+<div class="d-flex justify-content-end my-3">
+	<button type="button" class="btn btn-outline-success mx-3" (click)="submitShips()">Done</button>
+	<button type="button" class="btn btn-outline-danger mx-3" (click)="resetGrid()">Reset</button>
+</div>
+
 <table class="table table-bordered text-center">
 	<thead>
 		<tr>
@@ -8,8 +13,12 @@
 	<tbody>
 		<tr *ngFor="let row of rows">
 			<th scope="row">{{ row }}</th>
-			<td *ngFor="let col of cols" [className]="grid.get(row + col)">
-				<app-cell location="{{ row }}{{ col }}"></app-cell>
+			<td *ngFor="let col of cols" [attr.data-location]="row + col"
+				(dragenter)="onDragEnter($event)"
+				(dragleave)="onDragLeave($event)"
+				(dragover)="onDragOver($event)"
+				(drop)="onDrop($event)">
+				<app-cell shipData="{{this.grid.get(row + col)}}"></app-cell>
 			</td>
 		</tr>
 	</tbody>

@@ -1,0 +1,5 @@
+.ship.vertical {
+	transform: rotate(90deg);
+	transform-origin: top left;
+	margin-left: 3em;
+}

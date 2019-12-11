@@ -3,16 +3,16 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --proxy-config proxy.conf.json",
     "build": "ng build",
-    "build-watch": "ng build --watch",
+    "watch": "ng build --watch",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "^8.2.13",
+    "@angular/animations": "^8.2.14",
     "@angular/common": "^8.2.13",
     "@angular/compiler": "^8.2.13",
     "@angular/core": "^8.2.13",
@@ -22,6 +22,7 @@
     "@angular/router": "^8.2.13",
     "@ng-bootstrap/ng-bootstrap": "^5.1.4",
     "bootstrap": "^4.3.1",
+    "ngx-toastr": "^11.2.1",
     "rxjs": "~6.4.0",
     "tslib": "^1.10.0",
     "zone.js": "~0.9.1"

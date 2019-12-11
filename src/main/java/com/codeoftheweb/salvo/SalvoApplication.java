@@ -17,11 +17,14 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -114,7 +117,7 @@ public class SalvoApplication extends SpringBootServletInitializer {
 }
 
 @Configuration
-class WebSecurityConfiguration extends GlobalAuthenticationConfigurerAdapter {
+class GlobalAuthenticationConfig extends GlobalAuthenticationConfigurerAdapter {
 
 	@Autowired
 	PlayerRepository playerRepository;
@@ -124,7 +127,7 @@ class WebSecurityConfiguration extends GlobalAuthenticationConfigurerAdapter {
 
 	@Override
 	public void init(AuthenticationManagerBuilder auth) throws Exception {
-		auth.userDetailsService(inputName-> {
+		auth.userDetailsService(inputName -> {
 			Player player = playerRepository.findByUserName(inputName);
 			if (player != null) {
 				return new User(player.getUserName(), player.getPassword(),
@@ -164,9 +167,9 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.csrf().disable();
 
 		// if user is not authenticated, just send an authentication failure response
-		http.exceptionHandling().authenticationEntryPoint((req, res, exc) -> res.sendError(HttpServletResponse.SC_UNAUTHORIZED));
+		http.exceptionHandling().authenticationEntryPoint(authenticationEntryPoint());
 
-		// if login is successful, just clear the flags asking for authentication
+		// if login is successful, send a success response, with JSON containing the current user
 		http.formLogin().successHandler(successHandler());
 
 		// if login fails, just send an authentication failure response
@@ -174,6 +177,13 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 		// if logout is successful, just send a success response
 		http.logout().logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler());
+	}
+	
+	private AuthenticationEntryPoint authenticationEntryPoint() {
+		return (httpServletRequest, httpServletResponse, exception) -> {
+			httpServletResponse.getWriter().append(exception.getMessage());
+			httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+		};
 	}
 
 	private AuthenticationSuccessHandler successHandler() {
@@ -185,8 +195,8 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 
 	private AuthenticationFailureHandler failureHandler() {
-		return (httpServletRequest, httpServletResponse, authentication) -> {
-			httpServletResponse.getWriter().append(authentication.getMessage());
+		return (httpServletRequest, httpServletResponse, exception) -> {
+			httpServletResponse.getWriter().append(exception.getMessage());
 			httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		};
 	}

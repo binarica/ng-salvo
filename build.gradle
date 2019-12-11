@@ -24,6 +24,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-rest'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
+	compile 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'com.h2database:h2'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
@@ -32,16 +33,16 @@ node {
 	nodeModulesDir = file("$projectDir/src/main/webapp")
 }
 
-task buildClient(type: NpmTask, dependsOn: 'npmInstall') {
+task ngBuild(type: NpmTask, dependsOn: 'npmInstall') {
 	group = BasePlugin.BUILD_GROUP
 	args = ['run', 'build']
 }
 
-task buildClientWatch(type: NpmTask, dependsOn: 'npmInstall') {
-	group = 'application'
-	args = ['run', 'build-watch']
+task ngWatch(type: NpmTask, dependsOn: 'npmInstall') {
+	group = BasePlugin.BUILD_GROUP
+	args = ['run', 'watch']
 }
 
 npmInstall.args = ['--loglevel', 'info']
 
-processResources.dependsOn 'buildClient'
+processResources.dependsOn 'ngBuild'
