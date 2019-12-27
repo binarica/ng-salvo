@@ -1,5 +1,5 @@
 <div *ngIf="isLoggedIn(); else login" class="mt-2 text-right">
-	<h5> {{ currentPlayer.email }} <button type="button" class="btn btn-sm btn-danger" (click)="logout()">Log Out</button></h5>
+	<h5 class="text-light">{{ currentPlayer.email }} <button type="button" class="btn btn-sm btn-danger" (click)="logout()">Log Out</button></h5>
 </div>
 
 <ng-template #login>

@@ -7,7 +7,7 @@ import { Component, OnInit, Input } from '@angular/core';
 })
 
 export class CellComponent implements OnInit {
-	@Input() shipData;
+	@Input() cellData;
 
 	constructor() { }
 
@@ -16,17 +16,21 @@ export class CellComponent implements OnInit {
 	}
 
 	getCssClass() {
-		return 'ship-'.concat(this.parseJSON(this.shipData).type.replace(/\s/, '-').toLowerCase());
+		const ship = this.parseJSON(this.cellData);
+		if (Object.prototype.hasOwnProperty.call(ship, 'type')) {
+			return 'ship ship-' + ship.type.replace(/\s/, '-').toLowerCase() + ' ' + this.getOrientation(ship);
+		}
+
+		return this.cellData;
 	}
 
-	getOrientation() {
-		const ship = this.parseJSON(this.shipData);
+	getOrientation(ship) {
 		return ship.locations[0].charAt(0) === ship.locations[1].charAt(0) ? 'horizontal' : 'vertical';
 	}
 
 	parseJSON(json) {
 		try {
-			return JSON.parse(this.shipData);
+			return JSON.parse(json);
 		} catch (e) {
 			return '';
 		}

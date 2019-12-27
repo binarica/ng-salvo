@@ -37,7 +37,8 @@ import { ShipListComponent } from './ship-list/ship-list.component';
 		NgbModule,
 		BrowserAnimationsModule,
 		ToastrModule.forRoot({
-			positionClass: 'toast-top-center'
+			positionClass: 'toast-top-center',
+			preventDuplicates: true
 		})
 	],
 	providers: [

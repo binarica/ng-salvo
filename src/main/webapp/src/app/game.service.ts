@@ -15,15 +15,15 @@ export class GameService {
 
 	constructor(private http: HttpClient) { }
 
-	getGames(): Observable<any> {
-		return this.http.get<any>(`${environment.apiUrl}/games`);
+	getGames(): Observable<object> {
+		return this.http.get<object>(`${environment.apiUrl}/games`);
 	}
 
-	createGame(): Observable<any> {
+	createGame(): Observable<object> {
 		return this.http.post(`${environment.apiUrl}/games`, {});
 	}
 
-	joinGame(gameId: number): Observable<any> {
+	joinGame(gameId: number): Observable<object> {
 		return this.http.post(`${environment.apiUrl}/games/${gameId}/players`, {});
 	}
 
@@ -31,7 +31,11 @@ export class GameService {
 		return this.http.get<Game>(`${environment.apiUrl}/game_view/${gamePlayerId}`);
 	}
 
-	addShips(gamePlayerId: number, ships: Ship[]): Observable<any> {
+	addShips(gamePlayerId: number, ships: Ship[]): Observable<object> {
 		return this.http.post(`${environment.apiUrl}/games/players/${gamePlayerId}/ships`, ships);
+	}
+
+	addSalvo(gamePlayerId: number, shots: string[]): Observable<object> {
+		return this.http.post(`${environment.apiUrl}/games/players/${gamePlayerId}/salvoes`, shots);
 	}
 }

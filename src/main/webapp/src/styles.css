@@ -1,5 +1,13 @@
 /* You can add global styles to this file, and also import other style files */
 
+* {
+	font-family: 'Oswald', sans-serif;
+}
+
+body {
+	background: url(assets/images/bg.jpg);
+}
+
 .modal > .modal-dialog {
 	animation-name: modal-fade;
 	animation-duration: 0.3s;
@@ -23,6 +31,7 @@
 
 td .ship {
 	margin: -0.75em;
+	transform: translateZ(1px);
 }
 
 .handle {
@@ -44,7 +53,6 @@ td .ship {
 	width: 9em;
 }
 
-
 .ship-battleship {
 	background-image: url(assets/images/ships/battleship.png);
 	width: 12em;
@@ -53,4 +61,8 @@ td .ship {
 .ship-aircraft-carrier {
 	background-image: url(assets/images/ships/aircraft-carrier.png);
 	width: 15em;
+}
+
+.salvo {
+	background: url(assets/images/ammo.png) center / 150%;
 }

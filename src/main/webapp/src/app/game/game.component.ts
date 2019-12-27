@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { GameService } from '../game.service';
 import { Game } from '../game';
 import { Ship } from '../ship';
+import { Salvo } from '../salvo';
 
 @Component({
 	selector: 'app-game',
@@ -16,6 +17,10 @@ export class GameComponent implements OnInit {
 	game: Game = null;
 	players: string[] = [];
 	ships: Ship[];
+	playerSalvoes: Salvo[];
+	opponentSalvoes: Salvo[];
+	donePlacingShips = false;
+	readyToShoot = true;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -32,15 +37,19 @@ export class GameComponent implements OnInit {
 		this.gameService.getGame(id)
 			.subscribe(game => {
 				this.game = game;
-				this.players = game.gamePlayers
-					.sort(gamePlayer => gamePlayer.id === id ? -1 : 1)
-					.map(gamePlayer => gamePlayer.player.email);
-				this.ships = game.ships;
-			});
-	}
 
-	isGameStarted() {
-		// TODO: Toggle once finished placing ships
-		return false;
+				const gamePlayers = game.gamePlayers.sort(gamePlayer => gamePlayer.id === id ? -1 : 1);
+
+				this.players = gamePlayers.map(gamePlayer => gamePlayer.player.email);
+
+				this.ships = game.ships;
+
+				const currentPlayer = gamePlayers[0];
+
+				this.playerSalvoes = game.salvoes.filter(salvo => salvo.player === currentPlayer.player.id);
+				this.opponentSalvoes = game.salvoes.filter(salvo => salvo.player !== currentPlayer.player.id);
+
+				this.donePlacingShips = game.ships.length !== 0;
+			});
 	}
 }

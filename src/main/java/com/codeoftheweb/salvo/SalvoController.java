@@ -8,10 +8,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -41,9 +42,12 @@ public class SalvoController {
 	private ShipRepository shipRepository;
 
 	@Autowired
+	private SalvoRepository salvoRepository;
+
+	@Autowired
 	private PasswordEncoder passwordEncoder;
 
-	@RequestMapping(path = "/games", method = RequestMethod.GET)
+	@GetMapping("/games")
 	public Map<String, Object> getGames() {
 		Player player = getCurrentPlayer();
 
@@ -61,7 +65,7 @@ public class SalvoController {
 		return dto;
 	}
 
-	@RequestMapping(path = "/games", method = RequestMethod.POST)
+	@PostMapping("/games")
 	public ResponseEntity<Object> createGame() {
 		// gets the current user
 		Player player = getCurrentPlayer();
@@ -81,12 +85,12 @@ public class SalvoController {
 		return new ResponseEntity<>(gamePlayer.getId(), HttpStatus.CREATED);
 	}
 	
-	@RequestMapping(path = "/games/{gameId}/players", method = RequestMethod.GET)
+	@GetMapping("/games/{gameId}/players")
 	public ResponseEntity<Object> getPlayers(@PathVariable Long gameId) {
 		// JSON list of players in game nn
 		Game game =  gameRepository.findById(gameId).orElse(null);
 		if (game == null) {
-			return new ResponseEntity<>(String.format(ErrorMessage.NOT_FOUND, "Game"), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(ErrorMessage.NO_SUCH_GAME, HttpStatus.NOT_FOUND);
 		}
 		
 		List<Map<String, Object>> players = game.getPlayers()
@@ -97,11 +101,10 @@ public class SalvoController {
 		return new ResponseEntity<>(players, HttpStatus.OK);
 	}
 
-	@RequestMapping(path = "/games/{gameId}/players", method = RequestMethod.POST)
+	@PostMapping("/games/{gameId}/players")
 	public ResponseEntity<Object> joinGame(@PathVariable Long gameId) {
 		/*
-			success: 201 created;
-			content: { gpid: mm }
+			success: 201 created
 			
 			failure responses:
 			401 unauthorized if not logged in
@@ -132,12 +135,12 @@ public class SalvoController {
 		return new ResponseEntity<>(newGamePlayer.getId(), HttpStatus.CREATED);
 	}
 	
-	@RequestMapping(path = "/games/players/{gamePlayerId}/ships", method = RequestMethod.GET)
+	@GetMapping("/games/players/{gamePlayerId}/ships")
 	public ResponseEntity<Object> getShips(@PathVariable long gamePlayerId) {
 		// JSON list of current ships for game player nn
 		GamePlayer gamePlayer =  gamePlayerRepository.findById(gamePlayerId).orElse(null);
 		if (gamePlayer == null) {
-			return new ResponseEntity<>(String.format(ErrorMessage.NOT_FOUND, "GamePlayer"), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(ErrorMessage.GAME_PLAYER_NOT_FOUND, HttpStatus.NOT_FOUND);
 		}
 		
 		List<Map<String, Object>> ships = gamePlayer.getShips()
@@ -149,7 +152,7 @@ public class SalvoController {
 	}
 	
 	
-	@RequestMapping(path = "/games/players/{gamePlayerId}/ships", method = RequestMethod.POST)
+	@PostMapping("/games/players/{gamePlayerId}/ships")
 	public ResponseEntity<Object> addShips(@PathVariable long gamePlayerId, @RequestBody List<Ship> ships) {
 		/*
 			success: 201 created
@@ -159,50 +162,43 @@ public class SalvoController {
 			403 forbidden: no such game player, ships already placed, too many ships
 		 */
 		
-		ResponseEntity<Object> response;
-		
 		Player player = getCurrentPlayer();
 		if (player == null) {
 			return new ResponseEntity<>(ErrorMessage.NOT_LOGGED_IN, HttpStatus.UNAUTHORIZED);
 		}
 
-		else {
+		GamePlayer gamePlayer = gamePlayerRepository.findById(gamePlayerId).orElse(null);
 
-			GamePlayer gamePlayer = gamePlayerRepository.findById(gamePlayerId).orElse(null);
-
-			if (gamePlayer == null) {
-				return new ResponseEntity<>(String.format(ErrorMessage.NOT_FOUND, "GamePlayer"), HttpStatus.NOT_FOUND);
-			}
-
-			if (!player.getId().equals(gamePlayer.getPlayer().getId())) {
-				return new ResponseEntity<>(ErrorMessage.ANOTHER_PLAYER, HttpStatus.UNAUTHORIZED);
-			}
-
-			if (!CollectionUtils.isEmpty(gamePlayer.getShips())) {
-				return new ResponseEntity<>(ErrorMessage.SHIPS_ALREADY_PLACED, HttpStatus.FORBIDDEN);
-			}
-
-			if (ships == null || ships.size() != 5) {
-				return new ResponseEntity<>(ErrorMessage.SHIPS_NOT_ALLOWED, HttpStatus.FORBIDDEN);
-			}
-			else {
-				if (ships.stream().anyMatch(Ship::isOutOfRange)) {
-					response = new ResponseEntity<>(ErrorMessage.SHIPS_OUT_OF_RANGE, HttpStatus.FORBIDDEN);
-				}
-				else if (ships.stream().anyMatch(Ship::isNotConsecutive)) {
-					response = new ResponseEntity<>(ErrorMessage.SHIPS_NOT_CONSECUTIVE, HttpStatus.FORBIDDEN);
-				}
-				else if (this.areOverlapped(ships)) {
-					response = new ResponseEntity<>(ErrorMessage.SHIPS_OVERLAPPED, HttpStatus.FORBIDDEN);
-				}
-				else {
-					ships.forEach(ship -> shipRepository.save(new Ship(gamePlayer, ship.getType(), ship.getLocations())));
-					response = new ResponseEntity<>(HttpStatus.CREATED);
-				}
-			}
+		if (gamePlayer == null) {
+			return new ResponseEntity<>(ErrorMessage.GAME_PLAYER_NOT_FOUND, HttpStatus.NOT_FOUND);
 		}
-		
-		return response;
+
+		if (!player.getId().equals(gamePlayer.getPlayer().getId())) {
+			return new ResponseEntity<>(ErrorMessage.ANOTHER_PLAYER, HttpStatus.UNAUTHORIZED);
+		}
+
+		if (!CollectionUtils.isEmpty(gamePlayer.getShips())) {
+			return new ResponseEntity<>(ErrorMessage.SHIPS_ALREADY_PLACED, HttpStatus.FORBIDDEN);
+		}
+
+		if (ships == null || ships.size() != 5) {
+			return new ResponseEntity<>(ErrorMessage.SHIPS_NOT_ALLOWED, HttpStatus.FORBIDDEN);
+		}
+
+		if (ships.stream().anyMatch(Ship::isOutOfRange)) {
+			return new ResponseEntity<>(ErrorMessage.SHIPS_OUT_OF_RANGE, HttpStatus.FORBIDDEN);
+		}
+
+		if (ships.stream().anyMatch(Ship::isNotConsecutive)) {
+			return new ResponseEntity<>(ErrorMessage.SHIPS_NOT_CONSECUTIVE, HttpStatus.FORBIDDEN);
+		}
+
+		if (this.areOverlapped(ships)) {
+			return new ResponseEntity<>(ErrorMessage.SHIPS_OVERLAPPED, HttpStatus.FORBIDDEN);
+		}
+
+		ships.forEach(ship -> shipRepository.save(new Ship(gamePlayer, ship.getType(), ship.getLocations())));
+		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 	
 	private boolean areOverlapped(List<Ship> ships) {
@@ -221,11 +217,63 @@ public class SalvoController {
 		return false;
 	}
 
-	@RequestMapping("/game_view/{gamePlayerId}")
+	@GetMapping("/games/players/{gamePlayerId}/salvoes")
+	public ResponseEntity<Object> getSalvoes(@PathVariable long gamePlayerId) {
+		// JSON list of all salvoes for game player nn
+		GamePlayer gamePlayer =  gamePlayerRepository.findById(gamePlayerId).orElse(null);
+		if (gamePlayer == null) {
+			return new ResponseEntity<>(ErrorMessage.GAME_PLAYER_NOT_FOUND, HttpStatus.NOT_FOUND);
+		}
+		
+		List<Map<String, Object>> salvoes = gamePlayer.getSalvoes()
+				.stream()
+				.map(Salvo::toDto)
+				.collect(toList());
+		
+		return new ResponseEntity<>(salvoes, HttpStatus.OK);
+	}
+	
+	@PostMapping(path = "/games/players/{gamePlayerId}/salvoes")
+	public ResponseEntity<Object> addSalvo(@PathVariable long gamePlayerId, @RequestBody List<String> shots) {
+		/*
+			success: 201 created
+
+			failure responses:
+			401 unauthorized if not logged in, not game player nn
+			403 forbidden: no such game player, salvo already fired for this turn, too many shots in salvo
+		*/
+
+		Player player = getCurrentPlayer();
+		if (player == null) {
+			return new ResponseEntity<>(ErrorMessage.NOT_LOGGED_IN, HttpStatus.UNAUTHORIZED);
+		}
+
+		GamePlayer gamePlayer = gamePlayerRepository.findById(gamePlayerId).orElse(null);
+
+		if (gamePlayer == null) {
+			return new ResponseEntity<>(ErrorMessage.NO_SUCH_GAME, HttpStatus.NOT_FOUND);
+		}
+
+		if (!player.getId().equals(gamePlayer.getPlayer().getId())) {
+			return new ResponseEntity<>(ErrorMessage.ANOTHER_PLAYER, HttpStatus.UNAUTHORIZED);
+		}
+		
+		if (shots.size() != 5) {
+			return new ResponseEntity<>(ErrorMessage.SALVO_WRONG_NUMBER, HttpStatus.FORBIDDEN);
+		}
+		
+		Long turn = gamePlayer.getSalvoes().size() + 1L;
+		
+		Salvo salvo = new Salvo(gamePlayer, turn, shots);
+		salvoRepository.save(salvo);
+		return new ResponseEntity<>(salvo.toDto(), HttpStatus.CREATED);
+}
+
+	@GetMapping("/game_view/{gamePlayerId}")
 	public ResponseEntity<Object> getGameView(@PathVariable Long gamePlayerId) {
 		GamePlayer gamePlayer =  gamePlayerRepository.findById(gamePlayerId).orElse(null);
 		if (gamePlayer == null) {
-			return new ResponseEntity<>(String.format(ErrorMessage.NOT_FOUND, "GamePlayer"), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(ErrorMessage.GAME_PLAYER_NOT_FOUND, HttpStatus.NOT_FOUND);
 		}
 
 		Player player = getCurrentPlayer();
@@ -254,7 +302,7 @@ public class SalvoController {
 		return new ResponseEntity<>(dto, HttpStatus.OK);
 	}
 
-	@RequestMapping(path = "/players", method = RequestMethod.POST)
+	@PostMapping(path = "/players")
 	public ResponseEntity<Object> createPlayer(@RequestParam String username, @RequestParam String password) {
 		if (username.isEmpty()) {
 			return new ResponseEntity<>(ErrorMessage.NO_NAME, HttpStatus.FORBIDDEN);

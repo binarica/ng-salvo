@@ -20,7 +20,7 @@ import java.util.Map;
 @Entity
 public class Ship {
 	
-	public static final Map<String, Integer> shipTypeMap = new HashMap<>();
+	protected static final Map<String, Integer> shipTypeMap = new HashMap<>();
 	
 	static {
 		shipTypeMap.put("Aircraft Carrier", 5);
@@ -85,7 +85,7 @@ public class Ship {
 	
 	public Boolean isNotConsecutive() {
 		
-		for (int i = 0; i < locations.size(); i ++){
+		for (int i = 0; i < locations.size(); i ++) {
 			
 			if (i < locations.size() - 1) {
 				if (isVertical()) {
@@ -110,7 +110,7 @@ public class Ship {
 						return true;
 					}
 				} else {
-					if (!locations.get(i).substring(0,1).equals(locations.get(j).substring(0, 1))) {
+					if (!locations.get(i).substring(0, 1).equals(locations.get(j).substring(0, 1))) {
 						return true;
 					}
 				}
@@ -129,7 +129,7 @@ public class Ship {
 		return dto;
 	}
 	
-	private Boolean isVertical() {
+	private boolean isVertical() {
 		return locations.get(0).charAt(0) != locations.get(1).charAt(0);
 	}
 }

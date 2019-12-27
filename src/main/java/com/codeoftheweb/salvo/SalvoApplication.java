@@ -18,17 +18,14 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+
 
 @SpringBootApplication
 public class SalvoApplication extends SpringBootServletInitializer {
@@ -44,7 +41,7 @@ public class SalvoApplication extends SpringBootServletInitializer {
 	                                  ShipRepository shipRepository,
 	                                  SalvoRepository salvoRepository,
 	                                  ScoreRepository scoreRepository) {
-		return (args) -> {
+		return args -> {
 
 			Player player1 = new Player("j.bauer@ctu.gov", passwordEncoder().encode("24"));
 			Player player2 = new Player("c.obrian@ctu.gov", passwordEncoder().encode("42"));

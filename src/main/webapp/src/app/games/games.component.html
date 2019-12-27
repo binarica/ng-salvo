@@ -6,11 +6,11 @@
 			<li *ngFor="let game of games">
 				<p>
 
-					<a *ngIf="hasJoined(game); else nolink" [routerLink]="" (click)="reenterGame(game)">
+					<a *ngIf="hasJoined(game); else noLink" [routerLink]="" (click)="reenterGame(game)" class="text-dark">
 						{{ getItemHtml(game) }}
 					</a>
 
-					<ng-template #nolink> {{ getItemHtml(game) }} </ng-template>
+					<ng-template #noLink class="text-dark"> {{ getItemHtml(game) }} </ng-template>
 
 					<button *ngIf="!hasJoined(game)" type="button" class="btn btn-outline-primary btn-sm mx-2" (click)="joinGame(game.id)">Join Game</button>
 

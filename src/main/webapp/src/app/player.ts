@@ -3,10 +3,10 @@ import { Optional } from '@angular/core';
 export class Player {
 	id: number;
 	name: string;
-	total? = 0;
-	won? = 0;
-	lost? = 0;
-	tied? = 0;
+	total ? = 0;
+	won ? = 0;
+	lost ? = 0;
+	tied ? = 0;
 
 	constructor(id: number, name: string, @Optional() scores: number[]) {
 		this.id = id;

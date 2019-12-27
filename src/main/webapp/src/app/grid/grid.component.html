@@ -1,12 +1,7 @@
-<div class="d-flex justify-content-end my-3">
-	<button type="button" class="btn btn-outline-success mx-3" (click)="submitShips()">Done</button>
-	<button type="button" class="btn btn-outline-danger mx-3" (click)="resetGrid()">Reset</button>
-</div>
-
-<table class="table table-bordered text-center">
+<table class="table table-bordered text-center mx-auto">
 	<thead>
 		<tr>
-			<th></th>
+			<th scope="col"></th>
 			<th scope="col" *ngFor="let col of cols">{{ col }}</th>
 		</tr>
 	</thead>
@@ -17,8 +12,9 @@
 				(dragenter)="onDragEnter($event)"
 				(dragleave)="onDragLeave($event)"
 				(dragover)="onDragOver($event)"
-				(drop)="onDrop($event)">
-				<app-cell shipData="{{this.grid.get(row + col)}}"></app-cell>
+				(drop)="onDrop($event)"
+				(click)="onClick($event)">
+				<app-cell cellData="{{this.grid.get(row + col)}}"></app-cell>
 			</td>
 		</tr>
 	</tbody>

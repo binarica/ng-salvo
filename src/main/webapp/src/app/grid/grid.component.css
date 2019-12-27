@@ -2,12 +2,12 @@ table {
 	background: url(../../assets/images/ocean.gif) center / cover;
 	border: 2px solid #888;
 	table-layout: fixed;
+	max-width: 33rem;
 }
 
 th {
 	background: #aaa url(../../assets/images/dock-texture.jpg);
 }
-
 
 td.busy {
 	border: 2px solid #009;
