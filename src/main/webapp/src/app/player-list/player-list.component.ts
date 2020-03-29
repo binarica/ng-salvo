@@ -19,7 +19,7 @@ export class PlayerListComponent implements OnInit {
 	ngOnInit() {
 		this.gameService.getGames()
 			.subscribe(data => {
-				const games = data.games;
+				const games = data['games'];
 				this.gamePlayers = games.flatMap(game => game.gamePlayers);
 				this.players = this.getPlayersList();
 		});

@@ -28,8 +28,8 @@ export class GamesComponent implements OnInit {
 	getGames() {
 		this.gameService.getGames()
 			.subscribe(data => {
-				this.player = data.player;
-				this.games = data.games;
+				this.player = data['player'];
+				this.games = data['games'];
 			});
 	}
 
@@ -52,7 +52,7 @@ export class GamesComponent implements OnInit {
 		this.redirectToGamePage(gpid);
 	}
 
-	redirectToGamePage(gpid: number) {
+	redirectToGamePage(gpid) {
 		this.router
 			.navigate(['/game', { gp: gpid }])
 			.then();

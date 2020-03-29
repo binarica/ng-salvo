@@ -65,6 +65,6 @@ public class Player {
 	}
 
 	public String toJson() {
-		return String.format("{ \"id\": %d, \"email\": \"%s\" }", id, userName);
+		return String.format("{ \"id\": %d, \"name\": \"%s\" }", id, userName);
 	}
 }
