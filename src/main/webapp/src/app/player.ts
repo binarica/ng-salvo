@@ -2,15 +2,15 @@ import { Optional } from '@angular/core';
 
 export class Player {
 	id: number;
-	name: string;
+	email: string;
 	total ? = 0;
 	won ? = 0;
 	lost ? = 0;
 	tied ? = 0;
 
-	constructor(id: number, name: string, @Optional() scores: number[]) {
+	constructor(id: number, email: string, @Optional() scores: number[]) {
 		this.id = id;
-		this.name = name;
+		this.email = email;
 		this.total = scores.reduce((a, b) => a + b);
 
 		for (const score of scores) {
